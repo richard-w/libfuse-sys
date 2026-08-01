@@ -23,10 +23,10 @@ fn fuse_binding_filter(builder: bindgen::Builder) -> bindgen::Builder {
     let mut builder = builder
         // Whitelist "fuse_*" symbols and blocklist everything else
         .allowlist_recursively(false)
-        .allowlist_type("(?i)^fuse.*")
-        .allowlist_function("(?i)^fuse.*")
-        .allowlist_var("(?i)^fuse.*")
-        .allowlist_type("(?i)^libfuse.*")
+        .allowlist_type("fuse.*")
+        .allowlist_function("fuse.*")
+        .allowlist_var("FUSE.*")
+        .allowlist_type("libfuse.*")
         .blocklist_type("fuse_log_func_t")
         .blocklist_function("fuse_set_log_func");
     // TODO: properly bind fuse_log_func_t and allowlist fuse_set_log_func again
@@ -93,7 +93,7 @@ fn generate_fuse_bindings(
         .derive_copy(true)
         .derive_debug(true)
         // Add CargoCallbacks so build.rs is rerun on header changes
-        .parse_callbacks(Box::new(bindgen::CargoCallbacks));
+        .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()));
 
     builder = binding_filter(builder);
 
