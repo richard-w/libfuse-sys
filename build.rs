@@ -43,9 +43,9 @@ fn cuse_binding_filter(builder: bindgen::Builder) -> bindgen::Builder {
     builder
         // Whitelist "cuse_*" symbols and blocklist everything else
         .allowlist_recursively(false)
-        .allowlist_type("(?i)^cuse.*")
-        .allowlist_function("(?i)^cuse.*")
-        .allowlist_var("(?i)^cuse.*")
+        .allowlist_type("cuse.*")
+        .allowlist_function("cuse.*")
+        .allowlist_var("CUSE.*")
 }
 
 fn generate_fuse_bindings(
