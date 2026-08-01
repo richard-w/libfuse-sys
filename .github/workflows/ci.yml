@@ -23,6 +23,9 @@ jobs:
       - name: Build
         run: cargo build --features fuse_26 --verbose
 
+      - name: Test
+        run: cargo test --features fuse_26 --verbose
+
   build-ubuntu-fuse3:
     runs-on: ubuntu-latest
     steps:
@@ -35,6 +38,8 @@ jobs:
       - name: Build
         run: cargo build --features fuse_35 --verbose
 
+      - name: Test
+        run: cargo test --features fuse_35 --verbose
 
   build-macos:
     runs-on: macos-latest
@@ -47,6 +52,9 @@ jobs:
 
       - name: Build
         run: cargo build --verbose
+
+      - name: Test
+        run: cargo test --verbose
 
       - name: Upload bindings
         uses: actions/upload-artifact@v7
