@@ -26,17 +26,19 @@ fn fuse_binding_filter(builder: bindgen::Builder) -> bindgen::Builder {
         .allowlist_type("(?i)^fuse.*")
         .allowlist_function("(?i)^fuse.*")
         .allowlist_var("(?i)^fuse.*")
+        .allowlist_type("(?i)^libfuse.*")
         .blocklist_type("fuse_log_func_t")
         .blocklist_function("fuse_set_log_func");
     // TODO: properly bind fuse_log_func_t and allowlist fuse_set_log_func again
 
     if cfg!(target_os = "macos") {
-        // osxfuse needs this type
-        builder = builder.allowlist_type("setattr_x");
+        // macfuse needs these types
+        builder = builder.allowlist_type("setattr_x").allowlist_type("statx");
     }
     builder
 }
 
+#[cfg(feature = "cuse_lowlevel")]
 fn cuse_binding_filter(builder: bindgen::Builder) -> bindgen::Builder {
     builder
         // Whitelist "cuse_*" symbols and blocklist everything else
@@ -107,6 +109,11 @@ fn generate_fuse_bindings(
     bindings
         .write_to_file(&bindings_path)
         .unwrap_or_else(|_| panic!("Failed to write {}", bindings_path.display()));
+    let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
+    let debug_bindings_path = manifest_dir
+        .join("target")
+        .join(bindings_path.file_name().unwrap());
+    std::fs::copy(bindings_path, debug_bindings_path).unwrap();
 }
 
 fn main() {

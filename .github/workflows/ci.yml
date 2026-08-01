@@ -36,14 +36,23 @@ jobs:
         run: cargo build --features fuse_35 --verbose
 
 
-  build-macos-11:
-    runs-on: macos-11
+  build-macos:
+    runs-on: macos-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Install osxfuse
-        run: brew install osxfuse
+      - name: Install macfuse
+        run: brew install macfuse
 
       - name: Build
         run: cargo build --verbose
+
+      - name: Upload bindings
+        uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: fuse_bindings
+          path: |
+            target/fuse.rs
+            target/fuse_lowlevel.rs
