@@ -15,7 +15,6 @@ pub mod fuse {
     /// Main function of FUSE
     ///
     /// Implemented as a macro in the original fuse header.
-    #[cfg(not(target_os = "macos"))] // FIXME: Deal with inlined fuse_main_real.
     pub unsafe fn fuse_main(
         argc: c_int,
         argv: *mut *mut c_char,

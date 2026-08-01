@@ -84,6 +84,9 @@ fn generate_fuse_bindings(
     // Chain compile flags
     let compile_flags = defines.chain(includes).chain(api_define);
 
+    let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
+    let statics_file = out_dir.join(header.replace(".h", "-statics.c"));
+
     // Create bindgen builder
     let mut builder = bindgen::builder()
         // Add clang flags
@@ -92,6 +95,9 @@ fn generate_fuse_bindings(
         .derive_default(true)
         .derive_copy(true)
         .derive_debug(true)
+        // Generate wrappers for static functions
+        .wrap_static_fns(true)
+        .wrap_static_fns_path(&statics_file)
         // Add CargoCallbacks so build.rs is rerun on header changes
         .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()));
 
@@ -104,7 +110,6 @@ fn generate_fuse_bindings(
         .unwrap_or_else(|_| panic!("Failed to generate {} bindings", header));
 
     // Write bindings to file
-    let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
     let bindings_path = out_dir.join(&header.replace(".h", ".rs"));
     bindings
         .write_to_file(&bindings_path)
@@ -114,6 +119,14 @@ fn generate_fuse_bindings(
         .join("target")
         .join(bindings_path.file_name().unwrap());
     std::fs::copy(bindings_path, debug_bindings_path).unwrap();
+
+    if std::fs::exists(&statics_file).unwrap() {
+        let api_version_string = api_version.to_string();
+        cc::Build::new()
+            .file(&statics_file)
+            .define("FUSE_USE_VERSION", Some(api_version_string.as_str()))
+            .compile(header.strip_suffix(".h").unwrap())
+    }
 }
 
 fn main() {
