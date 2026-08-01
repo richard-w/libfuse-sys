@@ -28,6 +28,12 @@ You can select other API versions for fuse. Currently supported are
 * `fuse_30`
 * `fuse_31`
 * `fuse_35`
+* `fuse_37`
+* `fuse_38`
+* `fuse_312`
+* `fuse_317`
+* `fuse_318`
+
 
 If no version is selected the crate defaults to version 26.
 

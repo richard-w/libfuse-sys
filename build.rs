@@ -148,7 +148,6 @@ fn main() {
     version!(api_version, "fuse_312", 312);
     version!(api_version, "fuse_317", 317);
     version!(api_version, "fuse_318", 318);
-    version!(api_version, "fuse_319", 319);
     // Warn if no API version is selected
     if api_version.is_none() {
         println!(
