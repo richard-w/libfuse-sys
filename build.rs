@@ -2,6 +2,7 @@ extern crate bindgen;
 extern crate pkg_config;
 
 use std::env;
+use std::fs;
 use std::iter;
 use std::path::PathBuf;
 
@@ -95,7 +96,7 @@ fn generate_fuse_bindings(
         .derive_default(true)
         .derive_copy(true)
         .derive_debug(true)
-        // Generate wrappers for static functions
+        // Generate wrappers for static functionsb/l
         .wrap_static_fns(true)
         .wrap_static_fns_path(&statics_file)
         // Add CargoCallbacks so build.rs is rerun on header changes
@@ -110,17 +111,21 @@ fn generate_fuse_bindings(
         .unwrap_or_else(|_| panic!("Failed to generate {} bindings", header));
 
     // Write bindings to file
-    let bindings_path = out_dir.join(&header.replace(".h", ".rs"));
+    let bindings_path = out_dir.join(header.replace(".h", ".rs"));
     bindings
         .write_to_file(&bindings_path)
         .unwrap_or_else(|_| panic!("Failed to write {}", bindings_path.display()));
     let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
-    let debug_bindings_path = manifest_dir
-        .join("target")
-        .join(bindings_path.file_name().unwrap());
-    std::fs::copy(bindings_path, debug_bindings_path).unwrap();
 
-    if std::fs::exists(&statics_file).unwrap() {
+    // Write debug bindings if the target directory exists
+    let target_dir = manifest_dir.join("target");
+    if target_dir.is_dir() {
+        let debug_bindings_path = target_dir.join(bindings_path.file_name().unwrap());
+        fs::copy(bindings_path, debug_bindings_path).unwrap();
+    }
+
+    // Compile wrapper library for static inline functions
+    if fs::exists(&statics_file).unwrap() {
         let api_version_string = api_version.to_string();
         cc::Build::new()
             .file(&statics_file)
