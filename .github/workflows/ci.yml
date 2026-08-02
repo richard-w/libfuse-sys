@@ -12,7 +12,15 @@ on:
 
 jobs:
   build-ubuntu-fuse2:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [
+          "ubuntu-24.04",
+          "ubuntu-26.04",
+          "ubuntu-24.04-arm",
+          "ubuntu-26.04-arm",
+        ]
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -26,8 +34,25 @@ jobs:
       - name: Test
         run: cargo test --features fuse_26 --verbose
 
+      - name: Upload bindings
+        uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: fuse_bindings
+          path: |
+            target/fuse.rs
+            target/fuse_lowlevel.rs
+
   build-ubuntu-fuse3:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [
+          "ubuntu-24.04",
+          "ubuntu-26.04",
+          "ubuntu-24.04-arm",
+          "ubuntu-26.04-arm",
+        ]
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -41,8 +66,25 @@ jobs:
       - name: Test
         run: cargo test --features fuse_35 --verbose
 
+      - name: Upload bindings
+        uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: fuse_bindings
+          path: |
+            target/fuse.rs
+            target/fuse_lowlevel.rs
+
   build-macos:
-    runs-on: macos-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [
+          "macos-15",
+          "macos-26",
+          "macos-15-intel",
+          "macos-26-intel",
+        ]
     steps:
       - name: Checkout
         uses: actions/checkout@v7
